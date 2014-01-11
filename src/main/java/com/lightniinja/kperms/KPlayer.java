@@ -5,119 +5,116 @@ import java.util.List;
 import java.io.File;
 import java.io.IOException;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
 public class KPlayer {
-	private String p = null;
-	private FileConfiguration c = null;
-	private KPermsPlugin pl = null;
-	public KPlayer(String p, KPermsPlugin pl) {
-		this.p = p;
-		this.pl = pl;
-		this.c = YamlConfiguration.loadConfiguration(new File(this.pl.getDataFolder() + "/playerdata/" + this.p + ".yml"));
-	}
-	public KPlayer(Player p, KPermsPlugin pl) {
-		this.p = p.getName();
-		this.pl = pl;
-		this.c = YamlConfiguration.loadConfiguration(new File(this.pl.getDataFolder() + "/playerdata/" + this.p + ".yml"));
+	private String playerName;
+	private File configFile;
+	private FileConfiguration config;
+	private KPermsPlugin plugin;
+	public KPlayer(OfflinePlayer player, KPermsPlugin plugin) {
+		this.playerName = player.getName();
+		this.plugin = plugin;
+		this.configFile = new File(plugin.getDataFolder().getPath() + "/playerdata/" + playerName + ".yml");
+		this.config = YamlConfiguration.loadConfiguration(configFile);
 	}
 	public boolean make() {
-		this.c.set("primaryGroup", new ConfigManager(this.pl).getDefaultGroup());
+		config.set("primaryGroup", new ConfigManager(plugin).getDefaultGroup());
 		try {
-			this.c.save(new File(this.pl.getDataFolder() + "/playerdata/" + this.p + ".yml"));
+			config.save(configFile);
 			return true;
 		} catch (IOException e) {
 			return false;
 		}
 	}
 	public String getPrimaryGroup() {
-		return this.c.getString("primaryGroup");
+		return config.getString("primaryGroup");
 	}
  	public List<String> getGroups() {
- 		return this.c.getStringList("groups");
+ 		return config.getStringList("groups");
  	}
 	public boolean setPrimaryGroup(String g) {
-		this.c.set("primaryGroup", g);
+		config.set("primaryGroup", g);
 		try {
-			this.c.save(new File(this.pl.getDataFolder() + "/playerdata/" + this.p + ".yml"));
+			config.save(configFile);
 			return true;
 		} catch (IOException e) {
 			return false;
 		}
 	}
 	public boolean isMemberOfGroup(String g) {
-		if(this.c.getStringList("groups").contains(g))
+		if(config.getStringList("groups").contains(g))
 			return true;
 		return false;
 	}
 	public void clearPermissions() {
-		for(PermissionAttachmentInfo a: this.pl.getServer().getPlayerExact(this.p).getEffectivePermissions()) {
-			if(a.getAttachment() == null)
+		for(PermissionAttachmentInfo attachmentInfo: plugin.getServer().getPlayerExact(playerName).getEffectivePermissions()) {
+			if(attachmentInfo.getAttachment() == null)
 				return;
-			this.pl.getServer().getPlayerExact(this.p).removeAttachment(a.getAttachment());
+			plugin.getServer().getPlayerExact(playerName).removeAttachment(attachmentInfo.getAttachment());
 		}
 	}
-	public boolean addGroup(String s) {
-		List<String> g = this.c.getStringList("groups");
-		g.add(s);
-		this.c.set("groups", g);
+	public boolean addGroup(String group) {
+		List<String> groups = config.getStringList("groups");
+		groups.add(group);
+		config.set("groups", group);
 		try {
-			this.c.save(new File(this.pl.getDataFolder() + "/playerdata/" + this.p + ".yml"));
-			new Utilities(this.pl).refreshAllPermissions();
+			config.save(configFile);
+			plugin.refreshAllPermissions();
 			return true;
 		} catch (IOException e) {
 			System.out.print(e.getMessage());
 			return false;
 		}
 	}
-	public boolean removeGroup(String s) {
-		List<String> g = this.c.getStringList("groups");
-		g.remove(s);
-		this.c.set("groups", g);
+	public boolean removeGroup(String groupName) {
+		List<String> groups = config.getStringList("groups");
+		groups.remove(groupName);
+		config.set("groups", groups);
 		try {
-			this.c.save(new File(this.pl.getDataFolder() + "/playerdata/" + this.p + ".yml"));
-			new Utilities(this.pl).refreshAllPermissions();
+			config.save(configFile);
+			plugin.refreshAllPermissions();
 			return true;
 		} catch (IOException e) {
 			return false;
 		}
 	}
-	public boolean addPermission(String s) {
-		List<String> g = this.c.getStringList("permissions");
-		g.add(s);
-		this.c.set("permissions", g);
+	public boolean addPermission(String permission) {
+		List<String> permissions = config.getStringList("permissions");
+		permissions.add(permission);
+		config.set("permissions", permissions);
 		try {
-			this.c.save(new File(this.pl.getDataFolder() + "/playerdata/" + this.p + ".yml"));
-			new Utilities(this.pl).refreshAllPermissions();
+			config.save(configFile);
+			plugin.refreshAllPermissions();
 			return true;
 		} catch (IOException e) {
 			return false;
 		}
 	}
 	public boolean removePermission(String s) {
-		List<String> g = this.c.getStringList("permissions");
+		List<String> g = config.getStringList("permissions");
 		g.remove(s);
-		this.c.set("permissions", g);
+		config.set("permissions", g);
 		try {
-			this.c.save(new File(this.pl.getDataFolder() + "/playerdata/" + this.p + ".yml"));
-			new Utilities(this.pl).refreshAllPermissions();
+			config.save(configFile);
+			plugin.refreshAllPermissions();
 			return true;
 		} catch (IOException e) {
 			return false;
 		}
 	}
 	public boolean hasPermission(String s) {
-		List<String> p = this.c.getStringList("permissions");
-		List<String> g = this.c.getStringList("groups");
-		g.add(this.c.getString("primaryGroup"));
+		List<String> p = config.getStringList("permissions");
+		List<String> g = config.getStringList("groups");
+		g.add(config.getString("primaryGroup"));
 		if(p.contains(s)) {
 			return true;
 		}
 		for(String str: g) {
-			if(new KGroup(str, this.pl).getPermissions().contains(s)) {
+			if(new KGroup(str, plugin).getPermissions().contains(s)) {
 				return true;
 			}
 		}
@@ -125,15 +122,15 @@ public class KPlayer {
 	}
 	public List<String> getPermissions() {
 		List<String> perms = new ArrayList<String>();
-		for(String s: this.c.getStringList("groups")) {
-			for(String perm: new KGroup(s, this.pl).getPermissions()) {
+		for(String s: config.getStringList("groups")) {
+			for(String perm: new KGroup(s, plugin).getPermissions()) {
 				perms.add(perm);
 			}
 		}
-		for(String perm: new KGroup(this.c.getString("primaryGroup"), this.pl).getPermissions()) {
+		for(String perm: new KGroup(config.getString("primaryGroup"), plugin).getPermissions()) {
 			perms.add(perm);
 		}
-		for(String perm: this.c.getStringList("permissions")) {
+		for(String perm: config.getStringList("permissions")) {
 			perms.add(perm);
 		}
 		return perms;
@@ -141,14 +138,14 @@ public class KPlayer {
 	public void assignPermissions() {
 		for(String s: this.getPermissions()) {
 			if(s.startsWith("-")) {
-				this.pl.getServer().getPlayerExact(this.p).addAttachment(this.pl, s.replace("-", ""), false);
+				plugin.getServer().getPlayerExact(playerName).addAttachment(plugin, s.replace("-", ""), false);
 			} else {
-				this.pl.getServer().getPlayerExact(this.p).addAttachment(this.pl, s, true);
+				plugin.getServer().getPlayerExact(playerName).addAttachment(plugin, s, true);
 			}
 		}
 	}
 	public boolean isGenerated() {
-		if(new File(this.pl.getDataFolder() + "/playerdata/" + this.p + ".yml").exists())
+		if(configFile.exists())
 			return true;
 		return false;
 	}

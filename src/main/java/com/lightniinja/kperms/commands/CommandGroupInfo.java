@@ -1,35 +1,27 @@
 package com.lightniinja.kperms.commands;
 
+import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
-import com.lightniinja.kperms.ConfigManager;
 import com.lightniinja.kperms.KGroup;
 import com.lightniinja.kperms.KPermsPlugin;
-import com.lightniinja.kperms.Utilities;
 
 public class CommandGroupInfo {
-	private CommandSender s = null;
-	private KPermsPlugin pl = null;
-	private Utilities u = null;
-	private ConfigManager m = null;
-	private String group = null;
-	public CommandGroupInfo(CommandSender s, KPermsPlugin pl, String group) {
-		this.s = s;
-		this.pl = pl;
-		this.u = new Utilities(this.pl);
-		this.m = new ConfigManager(this.pl);
-		this.group = group;
+	private KPermsPlugin plugin;
+	public CommandGroupInfo(KPermsPlugin plugin) {
+		this.plugin = plugin;
 	}
-	public void execute() {
-		if(!this.s.hasPermission("kperms.group.info")) {
-			this.s.sendMessage(new Utilities(this.pl).format(new ConfigManager(this.pl).getMessage("prefix") + " " + new ConfigManager(this.pl).getMessage("no-permission")));
+	public void execute(CommandSender sender, Command command, String label, String[] args) {
+		if(!sender.hasPermission("kperms.group.info")) {
+			sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.getConfigManager().getMessage("prefix") + " " + plugin.getConfigManager().getMessage("no-permission")));
 			return;
 		}
-		this.s.sendMessage(this.u.format("        &e*" + this.m.getMessage("prefix") + "&e*  &bGroup Info: &6" + this.group));
-		KGroup g = new KGroup(this.group, this.pl);
-		this.s.sendMessage(this.u.format("&c   Permissions:"));
-		for(String str: g.getPermissions()) {
-			this.s.sendMessage(this.u.format("     &e" + str));
+		sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "        &e*" + plugin.getConfigManager().getMessage("prefix") + "&e*  &bGroup Info: &6" + args[1]));
+		KGroup kGroup = new KGroup(args[1], plugin);
+		sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c   Permissions:"));
+		for(String str: kGroup.getPermissions()) {
+			sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "     &e" + str));
 		}
 	}
 }

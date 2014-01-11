@@ -1,42 +1,34 @@
 package com.lightniinja.kperms.commands;
 
+import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
-import com.lightniinja.kperms.ConfigManager;
 import com.lightniinja.kperms.KPermsPlugin;
-import com.lightniinja.kperms.Utilities;
 import com.lightniinja.kperms.KPlayer;
 
 public class CommandUserInfo {
-	private CommandSender s = null;
-	private KPermsPlugin pl = null;
-	private Utilities u = null;
-	private ConfigManager m = null;
-	private String player = null;
-	public CommandUserInfo(CommandSender s, KPermsPlugin pl, String player) {
-		this.s = s;
-		this.pl = pl;
-		this.u = new Utilities(this.pl);
-		this.m = new ConfigManager(this.pl);
-		this.player = player;
+	private KPermsPlugin plugin;
+	public CommandUserInfo(KPermsPlugin plugin) {
+		this.plugin = plugin;
 	}
-	public void execute() {
-		if(!this.s.hasPermission("kperms.user.info")) {
-			this.s.sendMessage(new Utilities(this.pl).format(new ConfigManager(this.pl).getMessage("prefix") + " " + new ConfigManager(this.pl).getMessage("no-permission")));
+	public void execute(CommandSender sender, Command command, String label, String[] args) {
+		if(!sender.hasPermission("kperms.user.info")) {
+			sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.getConfigManager().getMessage("prefix") + " " + plugin.getConfigManager().getMessage("no-permission")));
 			return;
 		}
-		this.s.sendMessage(this.u.format("        &e*" + this.m.getMessage("prefix") + "&e*  &bUser Info: &6" + this.player));
-		KPlayer p = new KPlayer(this.player, this.pl);
-		this.s.sendMessage(this.u.format("&c   Permissions:"));
-		for(String str: p.getPermissions()) {
-			this.s.sendMessage(this.u.format("     &e" + str));
+		sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "        &e*" + plugin.getConfigManager().getMessage("prefix") + "&e*  &bUser Info: &6" + args[1]));
+		KPlayer kPlayer = new KPlayer(plugin.getServer().getOfflinePlayer(args[1]), plugin);
+		sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c   Permissions:"));
+		for(String str: kPlayer.getPermissions()) {
+			sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "     &e" + str));
 		}
-		this.s.sendMessage(this.u.format("&c   Groups:"));
-		for(String str: p.getGroups()) {
-			if(str.equalsIgnoreCase(p.getPrimaryGroup()))
+		sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c   Groups:"));
+		for(String str: kPlayer.getGroups()) {
+			if(str.equalsIgnoreCase(kPlayer.getPrimaryGroup()))
 				continue;
-			this.s.sendMessage(this.u.format("     &e" + str));
+			sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "     &e" + str));
 		}
-		this.s.sendMessage(this.u.format("  &bPrimary group: &2" + p.getPrimaryGroup()));
+		sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "  &bPrimary group: &2" + kPlayer.getPrimaryGroup()));
 	}
 }

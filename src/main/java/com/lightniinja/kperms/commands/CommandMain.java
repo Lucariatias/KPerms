@@ -7,80 +7,110 @@ import org.bukkit.command.CommandSender;
 import com.lightniinja.kperms.KPermsPlugin;
 
 public class CommandMain implements CommandExecutor {
-	private KPermsPlugin pl = null;
-	public CommandMain(KPermsPlugin pl) {
-		this.pl = pl;
+	
+	private CommandAddGroup commandAddGroup;
+	private CommandAddPermission commandAddPermission;
+	private CommandGroupAdd commandGroupAdd;
+	private CommandGroupInfo commandGroupInfo;
+	private CommandGroupPAdd commandGroupPAdd;
+	private CommandGroupPRemove commandGroupPRemove;
+	private CommandGroupRemove commandGroupRemove;
+	private CommandHelp commandHelp;
+	private CommandReload commandReload;
+	private CommandRemoveGroup commandRemoveGroup;
+	private CommandRemovePermission commandRemovePermission;
+	private CommandSetGroup commandSetGroup;
+	private CommandUnknown commandUnknown;
+	private CommandUserInfo commandUserInfo;
+	
+	public CommandMain(KPermsPlugin plugin) {
+		commandAddGroup = new CommandAddGroup(plugin);
+		commandAddPermission = new CommandAddPermission(plugin);
+		commandGroupAdd = new CommandGroupAdd(plugin);
+		commandGroupInfo = new CommandGroupInfo(plugin);
+		commandGroupPAdd = new CommandGroupPAdd(plugin);
+		commandGroupPRemove = new CommandGroupPRemove(plugin);
+		commandGroupRemove = new CommandGroupRemove(plugin);
+		commandHelp = new CommandHelp(plugin);
+		commandReload = new CommandReload(plugin);
+		commandRemoveGroup = new CommandRemoveGroup(plugin);
+		commandRemovePermission = new CommandRemovePermission(plugin);
+		commandSetGroup = new CommandSetGroup(plugin);
+		commandUnknown = new CommandUnknown(plugin);
+		commandUserInfo = new CommandUserInfo(plugin);
 	}
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(args.length == 0) {
-			new CommandHelp(sender, this.pl).execute();
+			commandHelp.execute(sender, command, label, args);
 		} else if(args.length == 1) {
 			if(args[0].equalsIgnoreCase("help")) {
-				new CommandHelp(sender, this.pl).execute();
+				commandHelp.execute(sender, command, label, args);
 			} else if(args[0].equalsIgnoreCase("reload")) {
-				new CommandReload(sender, this.pl).execute();
+				commandReload.execute(sender, command, label, args);
 			} else {
-				new CommandUnknown(sender, this.pl).execute();
+				commandUnknown.execute(sender, command, label, args);
 			}
 		} else if(args.length == 2) {
 			if(args[0].equalsIgnoreCase("user")) {
-				new CommandUserInfo(sender, this.pl, args[1]).execute();
+				commandUserInfo.execute(sender, command, label, args);
+			} else if (args[0].equalsIgnoreCase("group")) {
+				commandGroupInfo.execute(sender, command, label, args);
 			} else {
-				new CommandUnknown(sender, this.pl).execute();
+				commandUnknown.execute(sender, command, label, args);
 			}
 		} else if(args.length == 3) {
 			if(args[0].equalsIgnoreCase("group")) {
 				if(args[2].equalsIgnoreCase("add")) {
-					new CommandGroupAdd(sender, this.pl, args[1]).execute();
+					commandGroupAdd.execute(sender, command, label, args);
 				} else if(args[2].equalsIgnoreCase("remove")) {
-					new CommandGroupRemove(sender, this.pl, args[1]).execute();
+					commandGroupRemove.execute(sender, command, label, args);
 				} else {
-					new CommandUnknown(sender, this.pl).execute();
+					commandUnknown.execute(sender, command, label, args);
 				}
 			} else {
-				new CommandUnknown(sender, this.pl).execute();
+				commandUnknown.execute(sender, command, label, args);
 			}
 		}else if(args.length == 5) {
 			if(args[0].equalsIgnoreCase("user")) {
 				if(args[2].equalsIgnoreCase("permission")) {
 					if(args[3].equalsIgnoreCase("add")) {
-						new CommandAddPermission(sender, this.pl, args[1], args[4]).execute();
+						commandAddPermission.execute(sender, command, label, args);
 					} else if(args[3].equalsIgnoreCase("remove")) {
-						new CommandRemovePermission(sender, this.pl, args[1], args[4]).execute();
+						commandRemovePermission.execute(sender, command, label, args);
 					} else {
-						new CommandUnknown(sender, this.pl).execute();
+						commandUnknown.execute(sender, command, label, args);
 					}
 				} else if(args[2].equalsIgnoreCase("group")) {
 					if(args[3].equalsIgnoreCase("set")) {
-						new CommandSetGroup(sender, this.pl, args[1], args[4]).execute();
+						commandSetGroup.execute(sender, command, label, args);
 					} else if(args[3].equalsIgnoreCase("add")) {
-						new CommandAddGroup(sender, this.pl, args[1], args[4]).execute();
+						commandAddGroup.execute(sender, command, label, args);
 					} else if(args[3].equalsIgnoreCase("remove")) {
-						new CommandRemoveGroup(sender, this.pl, args[1], args[4]).execute();
+						commandRemoveGroup.execute(sender, command, label, args);
 					} else {
-						new CommandUnknown(sender, this.pl).execute();
+						commandUnknown.execute(sender, command, label, args);
 					}
 				} else {
-					new CommandUnknown(sender, this.pl).execute();
+					commandUnknown.execute(sender, command, label, args);
 				}
 			} else if(args[0].equalsIgnoreCase("group")) {
 				if (args[2].equalsIgnoreCase("permission")) {
 					if(args[3].equalsIgnoreCase("add")) {
-						new CommandGroupPAdd(sender, this.pl, args[1], args[4]).execute();
+						commandGroupPAdd.execute(sender, command, label, args);
 					} else if(args[3].equalsIgnoreCase("remove")) {
-						new CommandGroupPRemove(sender, this.pl, args[1], args[4]).execute();
+						commandGroupPRemove.execute(sender, command, label, args);
 					} else {
-						new CommandUnknown(sender, this.pl).execute();
+						commandUnknown.execute(sender, command, label, args);
 					}
 				} else {
-					new CommandUnknown(sender, this.pl).execute();
+					commandUnknown.execute(sender, command, label, args);
 				}
 			} else {
-				new CommandUnknown(sender, this.pl).execute();
+				commandUnknown.execute(sender, command, label, args);
 			}
 		} else {
-			new CommandUnknown(sender, this.pl).execute();
+			commandUnknown.execute(sender, command, label, args);
 		}
 		return true;
 	}

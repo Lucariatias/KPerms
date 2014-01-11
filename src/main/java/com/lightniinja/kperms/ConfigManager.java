@@ -1,17 +1,19 @@
 package com.lightniinja.kperms;
 
+import org.bukkit.ChatColor;
+
 public class ConfigManager {
-	private KPermsPlugin pl;
-	public ConfigManager(KPermsPlugin pl) {
-		this.pl = pl;
+	private KPermsPlugin plugin;
+	public ConfigManager(KPermsPlugin plugin) {
+		this.plugin = plugin;
 	}
 	public String getDefaultGroup() {
-		return this.pl.getConfig().getString("defaultGroup");
+		return plugin.getConfig().getString("defaultGroup");
 	}
 	public String getMessage(String id) {
-		if(this.pl.getConfig().getString("messages." + id) == null) {
-			return new Utilities(this.pl).format("&cLanguage values not completed - check config.yml");
+		if(plugin.getConfig().getString("messages." + id) == null) {
+			return ChatColor.translateAlternateColorCodes('&', "&cLanguage values not completed - check config.yml");
 		}
-		return new Utilities(this.pl).format(this.pl.getConfig().getString("messages." + id));
+		return ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("messages." + id));
 	}
 }

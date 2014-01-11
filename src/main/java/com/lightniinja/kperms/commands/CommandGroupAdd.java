@@ -1,38 +1,32 @@
 package com.lightniinja.kperms.commands;
 
+import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
-import com.lightniinja.kperms.ConfigManager;
 import com.lightniinja.kperms.KGroup;
 import com.lightniinja.kperms.KPermsPlugin;
-import com.lightniinja.kperms.Utilities;
 
 public class CommandGroupAdd {
-	private CommandSender s = null;
-	private KPermsPlugin pl = null;
-	private Utilities u = null;
-	private ConfigManager m = null;
-	private String group = null;
-	public CommandGroupAdd(CommandSender s, KPermsPlugin pl, String group) {
-		this.s = s;
-		this.pl = pl;
-		this.u = new Utilities(this.pl);
-		this.m = new ConfigManager(this.pl);
-		this.group = group;
+	
+	private KPermsPlugin plugin;
+	
+	public CommandGroupAdd(KPermsPlugin plugin) {
+		this.plugin = plugin;
 	}
-	public void execute() {
-		if(!this.s.hasPermission("kperms.group.add")) {
-			this.s.sendMessage(this.u.format(this.m.getMessage("prefix") + " " + this.m.getMessage("no-permission")));
+	public void execute(CommandSender sender, Command command, String label, String[] args) {
+		if(!sender.hasPermission("kperms.group.add")) {
+			sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.getConfigManager().getMessage("prefix") + " " + plugin.getConfigManager().getMessage("no-permission")));
 			return;
 		}
-		KGroup g = new KGroup(this.group, this.pl);
-		if(g.isGenerated()) {
-			this.s.sendMessage(this.u.format(this.m.getMessage("prefix") + " " + this.m.getMessage("already-created")));
+		KGroup kGroup = new KGroup(args[1], plugin);
+		if(kGroup.isGenerated()) {
+			sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.getConfigManager().getMessage("prefix") + " " + plugin.getConfigManager().getMessage("already-created")));
 		} else {
-			if(g.make()) {
-				this.s.sendMessage(this.u.format(this.m.getMessage("prefix") + " " + this.m.getMessage("group-created")));
+			if(kGroup.make()) {
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.getConfigManager().getMessage("prefix") + " " + plugin.getConfigManager().getMessage("group-created")));
 			} else {
-				this.s.sendMessage(this.u.format(this.m.getMessage("prefix") + " " + this.m.getMessage("unsuccessful")));
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.getConfigManager().getMessage("prefix") + " " + plugin.getConfigManager().getMessage("unsuccessful")));
 			}
 		}
 	}

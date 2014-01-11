@@ -1,30 +1,24 @@
 package com.lightniinja.kperms.commands;
 
+import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
-import com.lightniinja.kperms.ConfigManager;
 import com.lightniinja.kperms.KPermsPlugin;
-import com.lightniinja.kperms.Utilities;
 
 public class CommandReload {
-	private CommandSender s = null;
-	private KPermsPlugin pl = null;
-	private Utilities u = null;
-	private ConfigManager m = null;
-	public CommandReload(CommandSender s, KPermsPlugin pl) {
-		this.s = s;
-		this.pl = pl;
-		this.u = new Utilities(this.pl);
-		this.m = new ConfigManager(this.pl);
+	private KPermsPlugin plugin;
+	public CommandReload(KPermsPlugin plugin) {
+		this.plugin = plugin;
 	}
-	public void execute() {
-		if(!this.s.hasPermission("kperms.reload")) {
-			this.s.sendMessage(this.u.format(this.m.getMessage("prefix") + " " + this.m.getMessage("no-permission")));
+	public void execute(CommandSender sender, Command command, String label, String[] args) {
+		if(!sender.hasPermission("kperms.reload")) {
+			sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.getConfigManager().getMessage("prefix") + " " + plugin.getConfigManager().getMessage("no-permission")));
 			return;
 		}
-		this.pl.reloadConfig();
-		this.pl.getServer().getPluginManager().disablePlugin(this.pl);
-		this.pl.getServer().getPluginManager().enablePlugin(this.pl);
-		this.s.sendMessage(this.u.format(this.m.getMessage("prefix") + " " + this.m.getMessage("reload-complete")));
+		plugin.reloadConfig();
+		plugin.getServer().getPluginManager().disablePlugin(plugin);
+		plugin.getServer().getPluginManager().enablePlugin(plugin);
+		sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.getConfigManager().getMessage("prefix") + " " + plugin.getConfigManager().getMessage("reload-complete")));
 	}
 }

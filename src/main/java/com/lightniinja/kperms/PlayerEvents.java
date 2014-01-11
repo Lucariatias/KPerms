@@ -8,29 +8,29 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public class PlayerEvents implements Listener {
 
-	private KPermsPlugin pl = null;
-	public PlayerEvents(KPermsPlugin pl) {
-		this.pl = pl;
+	private KPermsPlugin plugin;
+	public PlayerEvents(KPermsPlugin plugin) {
+		this.plugin = plugin;
 	}
 	
 	@EventHandler
-	public void onJoin(PlayerJoinEvent e) {
-		KPlayer p = new KPlayer(e.getPlayer().getName(), this.pl);
-		if(!p.isGenerated()) {
-			p.make();
-			this.pl.getLogger().info("Generated playerdata for " + e.getPlayer().getName());
+	public void onJoin(PlayerJoinEvent event) {
+		KPlayer kPlayer = new KPlayer(event.getPlayer(), plugin);
+		if(!kPlayer.isGenerated()) {
+			kPlayer.make();
+			plugin.getLogger().info("Generated playerdata for " + event.getPlayer().getName());
 		}
-		p.assignPermissions();
+		kPlayer.assignPermissions();
 	}
 	@EventHandler
-	public void onQuit(PlayerQuitEvent e) {
-		KPlayer p = new KPlayer(e.getPlayer().getName(), this.pl);
-		p.clearPermissions();
+	public void onQuit(PlayerQuitEvent event) {
+		KPlayer kPlayer = new KPlayer(event.getPlayer(), plugin);
+		kPlayer.clearPermissions();
 	}
 	@EventHandler
-	public void onKick(PlayerKickEvent e) {
-		KPlayer p = new KPlayer(e.getPlayer().getName(), this.pl);
-		p.clearPermissions();
+	public void onKick(PlayerKickEvent event) {
+		KPlayer kPlayer = new KPlayer(event.getPlayer(), plugin);
+		kPlayer.clearPermissions();
 	}
 	
 }
